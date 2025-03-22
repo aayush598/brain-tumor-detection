@@ -3,8 +3,6 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-# import matplotlib.pyplot as plt
-# import seaborn as sns
 
 # Load the trained model
 model = tf.keras.models.load_model('model.keras')
