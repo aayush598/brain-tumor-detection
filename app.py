@@ -4,6 +4,7 @@ import tensorflow as tf
 import os
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+import matplotlib.pyplot as plt
 
 # Load the trained model
 @st.cache_resource
@@ -105,42 +106,149 @@ elif page == "Dataset Overview":
 
     st.image("media/brain_glioma_0001.jpg", caption="Sample Brain MRI Dataset", use_column_width=True)
 
-# Exploratory Data Analysis (EDA)
 elif page == "EDA":
-    st.title("📈 Exploratory Data Analysis")
-    st.write(
-        """
-        Exploratory Data Analysis (EDA) helps in understanding the distribution of the dataset,  
-        the number of images per category, and visual patterns in the MRI scans.  
-        """
-    )
-    st.image("eda_chart.jpg", caption="EDA Analysis", use_column_width=True)
+    st.header("Exploratory Data Analysis (EDA)")
+
+    # Class Distribution
+    st.subheader("Class Distribution")
+    st.image("eda/ClassDistribution.png", caption="Distribution of Brain Tumor Classes")
+    st.write("- **Number of brain_glioma images:** 5000")
+    st.write("- **Number of brain_menin images:** 5000")
+
+    # Sample Images
+    st.subheader("Sample Images from Dataset")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("eda/sample_brain_glioma.png", caption="Sample: Brain Glioma", use_column_width=True)
+    with col2:
+        st.image("eda/sample_brain_menin.png", caption="Sample: Brain Meningioma", use_column_width=True)
+
+    # Class Balance
+    st.subheader("Class Balance Percentage")
+    st.image("eda/ClassBalancePercentage.png", caption="Class Balance Analysis")
+
+    # Aspect Ratio Distribution
+    st.subheader("Aspect Ratio Distribution")
+    st.image("eda/AspectRatioDistribution.png", caption="Aspect Ratio of Images")
+
+    # Data Augmentation Visualization
+    st.subheader("Data Augmentation Analysis")
+    st.image("eda/DataAugmentation.png", caption="Effect of Data Augmentation")
+
+    # Image Quality Analysis
+    st.subheader("Image Quality Analysis")
+    st.write(f"- **Sharpness (With Mask):** 33.32")
+    st.write(f"- **Brightness (With Mask):** 22.59")
+    st.write(f"- **Sharpness (Without Mask):** 79.43")
+    st.write(f"- **Brightness (Without Mask):** 32.47")
+
+    # Corrupted & Duplicate Images
+    st.subheader("Dataset Integrity Check")
+    st.write(f"- **Number of corrupted images:** 0")
+    st.write(f"- **Number of duplicate images:** 0")
+
 
 # Model Training Information
 elif page == "Model Training":
-    st.title("🚀 Model Training Information")
-    st.write(
-        """
-        The model is trained using a **Convolutional Neural Network (CNN)** architecture based on **MobileNetV2**.  
-        - Optimizer: **Adam**  
-        - Loss Function: **Categorical Crossentropy**  
-        - Learning Rate: **0.0001**  
-        - Training Epochs: **50**  
-        """
-    )
-    st.image("cnn_architecture.jpg", caption="CNN Model Architecture", use_column_width=True)
+    st.title("Model Training Details")
+    
+    # Dataset Information
+    st.subheader("Dataset Information")
+    st.write("**Dataset Location:** `/kaggle/input/multi-cancer/Multi Cancer/Multi Cancer/Brain Cancer`")
+    st.write("**Categories:** `brain_glioma`, `brain_menin`")
+    
+    # Dynamic Class Distribution
+    num_glioma = 5000
+    num_menin = 5000
+
+    st.write(f"**Number of Images:**")
+    st.write(f"- Brain Glioma: {num_glioma}")
+    st.write(f"- Brain Menin: {num_menin}")
+    
+    fig, ax = plt.subplots()
+    ax.bar(["Brain Glioma", "Brain Menin"], [num_glioma, num_menin], color=['blue', 'red'])
+    ax.set_ylabel("Number of Images")
+    st.pyplot(fig)
+    
+    # Preprocessing & Augmentation
+    st.subheader("Preprocessing & Augmentation")
+    st.write("**Image Preprocessing:**")
+    st.write("- Resized images to `150x150`")
+    st.write("- Applied `preprocess_input` from MobileNetV2")
+    
+    st.write("**Augmentation using `ImageDataGenerator`**")
+    st.write("- Rotation: `20°`")
+    st.write("- Width & Height Shift: `0.2`")
+    st.write("- Shear: `0.15`")
+    st.write("- Zoom: `0.15`")
+    st.write("- Horizontal Flip: `Enabled`")
+    st.write("- Fill Mode: `Nearest`")
+    
+    # Model Architecture
+    st.subheader("Model Architecture")
+    st.write("**Base Model:** `MobileNetV2 (Pretrained)`")
+    st.write("**Additional Layers:**")
+    st.write("- `AveragePooling2D`\n- `Flatten`\n- `Dense` (Fully Connected Layer)\n- `Dropout` (Regularization)\n- `Softmax Output Layer`")
+    
+    # Training Configuration
+    st.subheader("Training Configuration")
+    st.write("- **Epochs:** `2`")
+    st.write("- **Batch Size:** `32`")
+    st.write("- **Optimizer:** `Adam` with Learning Rate Scheduling")
+    st.write("- **Loss Function:** `Categorical Crossentropy`")
+    st.write("- **Callbacks Used:**\n  - `EarlyStopping`\n  - `TensorBoard`")
+    
+    # Hardware Acceleration
+    st.subheader("Hardware Acceleration")
+    st.write("**GPU Support:** Automatically detects CUDA availability")
+    st.write("**Computation Mode:**")
+    st.write("- If GPU available → Uses `/GPU:0`")
+    st.write("- Otherwise → Uses `/CPU:0`")
+
 
 # Model Evaluation Page
 elif page == "Model Evaluation":
-    st.title("📊 Model Evaluation")
-    st.write(
-        """
-        The trained model is evaluated based on accuracy, precision, recall, and F1-score.  
-        Below are the evaluation metrics from the validation dataset:  
-        - **Accuracy:** 92.5%  
-        - **Precision:** 90.8%  
-        - **Recall:** 91.2%  
-        - **F1-Score:** 91.0%  
-        """
-    )
-    st.image("confusion_matrix.jpg", caption="Confusion Matrix", use_column_width=True)
+    st.title("Model Evaluation")
+    
+    # Confusion Matrix
+    st.subheader("Confusion Matrix")
+    st.image("modelEvaluation/ConfusionMatrix.png", caption="Confusion Matrix", use_column_width=True)
+    
+    # Accuracy Graph
+    st.subheader("Accuracy Over Epochs")
+    st.image("modelEvaluation/Accuracy.png", caption="Accuracy Graph", use_column_width=True)
+    
+    # Loss Graph
+    st.subheader("Loss Over Epochs")
+    st.image("modelEvaluation/Loss.png", caption="Loss Graph", use_column_width=True)
+    
+    # Dataset Loading Information
+    st.subheader("Dataset Loading Information")
+    st.write("Loading brain_glioma images: 100%|██████████| 5000/5000 [00:23<00:00, 213.81image/s]")
+    st.write("Loading brain_menin images: 100%|██████████| 5000/5000 [00:24<00:00, 202.71image/s]")
+    
+    # Training Performance
+    st.subheader("Training Performance")
+    training_logs = """
+    Epoch 1/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 139s 1s/step - accuracy: 0.7628 - loss: 1.0700 - val_accuracy: 0.9415 - val_loss: 0.1463
+    Epoch 2/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 121s 1s/step - accuracy: 0.9186 - loss: 0.2206 - val_accuracy: 0.9520 - val_loss: 0.1191
+    Epoch 3/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 81s 810ms/step - accuracy: 0.9212 - loss: 0.1977 - val_accuracy: 0.9540 - val_loss: 0.1072
+    Epoch 4/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 123s 1s/step - accuracy: 0.9131 - loss: 0.2130 - val_accuracy: 0.9635 - val_loss: 0.0991
+    Epoch 5/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 120s 1s/step - accuracy: 0.9230 - loss: 0.1967 - val_accuracy: 0.9600 - val_loss: 0.0980
+    Epoch 6/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 80s 796ms/step - accuracy: 0.9379 - loss: 0.1508 - val_accuracy: 0.9595 - val_loss: 0.0949
+    Epoch 7/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 123s 1s/step - accuracy: 0.9269 - loss: 0.1857 - val_accuracy: 0.9670 - val_loss: 0.0811
+    Epoch 8/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 121s 1s/step - accuracy: 0.9278 - loss: 0.1597 - val_accuracy: 0.9690 - val_loss: 0.0866
+    Epoch 9/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 81s 813ms/step - accuracy: 0.9273 - loss: 0.1715 - val_accuracy: 0.9660 - val_loss: 0.0988
+    Epoch 10/10
+    100/100 ━━━━━━━━━━━━━━━━━━━━ 124s 1s/step - accuracy: 0.9372 - loss: 0.1374 - val_accuracy: 0.9695 - val_loss: 0.0770
+    """
+    st.text(training_logs)
